@@ -33,25 +33,25 @@ const corners = (state = []) => {
     };
   }
 
-  let xa = state.map(([x, _]) => x);
-  let ya = state.map(([_, y]) => y);
+  let xs = state.map(([x, _]) => x);
+  let ys = state.map(([_, y]) => y);
 
   return {
-    topRight: [Math.max(...xa), Math.max(...ya)],
-    bottomLeft: [Math.min(...xa), Math.min(...ya)]
+    topRight: [Math.max(...xs), Math.max(...ys)],
+    bottomLeft: [Math.min(...xs), Math.min(...ys)]
   };
 
 };
 
 
 const printCells = (state) => {
-  const {bottomLeft, topRight} = corners(state);
+  const { bottomLeft, topRight } = corners(state);
   let accumulator = "";
 
-  for (y = topRight[1]; y>=bottomLeft[1]; y--) {
+  for (let y = topRight[1]; y >= bottomLeft[1]; y--) {
     let row = [];
-    for (x = bottomLeft; x <= topRight[0]; x++) {
-      row.push(printCell([x, y], state));
+    for (let x = bottomLeft; x <= topRight[0]; x++) {
+      row.push(printCell([x,y], state));
     }
     accumulator += row.join(" ") + "\n";
   }
