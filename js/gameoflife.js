@@ -1,3 +1,5 @@
+const { declareExportAllDeclaration } = require("jscodeshift");
+
 function seed(a, b, c) {
   return Array.from(arguments);
 }
@@ -49,7 +51,7 @@ const printCells = (state) => {
 
   for (let y = topRight[1]; y >= bottomLeft[1]; y--) {
     let row = [];
-    for (let x = bottomLeft; x <= topRight[0]; x++) {
+    for (let x = bottomLeft[0]; x <= topRight[0]; x++) {
       row.push(printCell([x,y], state));
     }
     accumulator += row.join(" ") + "\n";
@@ -57,19 +59,64 @@ const printCells = (state) => {
   return accumulator;
 };
 
-const getNeighborsOf = ([x, y]) => {
-  [x-1, y+1,], [x, y+1], [x+1, y+1], [x=1, y], [x, y], [x+1, y], [x-1, y-1], [x, y-1], [x+1, y-1];
+const getNeighborsOf = ([x, y]) => [
+  [x-1, y+1], [x, y+1], [x+1, y+1],
+  [x-1, y], [x+1, y],
+  [x-1, y-1], [x, y-1], [x+1, y-1]
+];
+
+const getLivingNeighbors = (cell, state) => {
+  return getNeighborsOf(cell).filter((n) => contains.bind(state)(n));
 };
 
-const getLivingNeighbors = (cell, state) => {};
+const willBeAlive = (cell, state) => {
 
-const willBeAlive = (cell, state) => {};
+  let alive = contains.call(state, cell) ? true : false;
+  let livingNeighbors = getLivingNeighbors(cell, state);
 
-const calculateNext = (state) => {};
+  if(livingNeighbors.length === 3) {
+    return true; 
+  } else if(livingNeighbors.length === 2 && alive) {
+    return true; 
+  } else {
+    return false;
+  }
+};
 
-const iterate = (state, iterations) => {};
+const calculateNext = (state) => {
 
-const main = (pattern, iterations) => {};
+  const { bottomLeft, topRight } = corners(state);
+  let result = [];
+
+  for (let y = topRight[1] + 1; y >= bottomLeft[1] - 1; y--) {
+    for (let x = bottomLeft[0] - 1; x <= topRight[0]; x++) {
+      result = result.concat(willBeAlive([x,y], state) ? [[x, y]] : []);
+    }
+  }
+  return result;
+
+};
+
+const iterate = (state, iterations) => {
+
+  const gameStates = [state];
+
+  for(let i = 0; i < iterations; i++) {
+    gameStates.push(calculateNext(gameStates[gameStates.length - 1]));
+  }
+
+  return gameStates;
+};
+
+const main = (pattern, iterations) => {
+
+  const futureStates = iterate(startPatterns[pattern], iterations);
+
+  for(let i = 0; i < futureStates.length; i++) {
+    console.log(printCells(futureStates[i]));
+  }
+
+};
 
 const startPatterns = {
     rpentomino: [
