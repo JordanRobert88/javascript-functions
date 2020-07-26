@@ -21,18 +21,46 @@ function contains(cell) {
 }
 
 const printCell = (cell, state) => {
-  if(state.contains.call(cell)) {
-      return '\u25A3';
-    } else {
-      return '\u25A2';
-    }
+  return contains.call(state, cell) ? "\u25A3": "\u25A2";
 };
 
-const corners = (state = []) => {};
+const corners = (state = []) => {
 
-const printCells = (state) => {};
+  if (state.length === 0) {
+    return {
+        topRight: [0,0],
+        bottomLeft: [0,0]
+    };
+  }
 
-const getNeighborsOf = ([x, y]) => {};
+  let xa = state.map(([x, _]) => x);
+  let ya = state.map(([_, y]) => y);
+
+  return {
+    topRight: [Math.max(...xa), Math.max(...ya)],
+    bottomLeft: [Math.min(...xa), Math.min(...ya)]
+  };
+
+};
+
+
+const printCells = (state) => {
+  const {bottomLeft, topRight} = corners(state);
+  let accumulator = "";
+
+  for (y = topRight[1]; y>=bottomLeft[1]; y--) {
+    let row = [];
+    for (x = bottomLeft; x <= topRight[0]; x++) {
+      row.push(printCell([x, y], state));
+    }
+    accumulator += row.join(" ") + "\n";
+  }
+  return accumulator;
+};
+
+const getNeighborsOf = ([x, y]) => {
+  [x-1, y+1,], [x, y+1], [x+1, y+1], [x=1, y], [x, y], [x+1, y], [x-1, y-1], [x, y-1], [x+1, y-1];
+};
 
 const getLivingNeighbors = (cell, state) => {};
 
